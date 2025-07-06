@@ -1,98 +1,122 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🏎️ PitCrew AI — Virtual Race Engineer for F1 Games (MVP)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**PitCrew AI** é um projeto open-source que simula um engenheiro de pista virtual inteligente para os jogos da série **F1** da Codemasters, como **F1 24** e **F1 23**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+O app captura dados de telemetria em tempo real via UDP, analisa métricas cruciais e emite alertas de voz automáticos para o piloto durante a corrida — como um engenheiro real faria.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📌 Objetivo do MVP (Versão Inicial)
 
-## Project setup
+1. Capturar pacotes UDP nativos do F1 24.
+2. Processar pacotes de telemetria e status do carro:
+   - **ERS (energia da bateria)**
+   - **Temperaturas dos pneus**
+   - **Combustível**
+   - **DRS (sistema de asa móvel)**
+   - **Eventos críticos** (colisões, penalidades, etc.)
+3. Emitir alertas automáticos por voz (TTS) de forma educativa.
+4. Projeto modular, com arquitetura escalável e limpa.
 
-```bash
-$ npm install
+---
+
+## 🚀 Tecnologias Utilizadas
+
+| Tecnologia                  | Função                                          |
+| --------------------------- | ----------------------------------------------- |
+| **NestJS + TypeScript**     | Framework backend modular e escalável           |
+| **f1-telemetry-client**     | Parser oficial para os pacotes UDP do F1 24     |
+| **say.js**                  | Text-to-Speech para alertas de voz locais       |
+| **dotenv + @nestjs/config** | Gerenciamento de variáveis de ambiente          |
+| **chalk**                   | Logs coloridos no terminal para facilitar debug |
+
+---
+
+## 📦 Arquitetura do Projeto (Clean Architecture)
+
+pitcrew-ai/
+│
+├── src/
+│ ├── telemetry/ # Lógica de telemetria UDP
+│ │ ├── telemetry.module.ts
+│ │ ├── udp.service.ts # Listener UDP + roteamento de pacotes
+│ │ ├── parsers/ # Parsers para cada tipo de pacote UDP
+│ │ │ ├── telemetry.parser.ts
+│ │ │ ├── status.parser.ts
+│ │ │ └── event.parser.ts
+│ │ └── alerts/ # Regras e alertas automáticos
+│ │ ├── ers.alert.ts
+│ │ ├── tyre.alert.ts
+│ │ ├── drs.alert.ts
+│ │ └── fuel.alert.ts
+│ │
+│ ├── common/ # Utilitários gerais
+│ │ ├── tts.util.ts # Função de voz (Text-to-Speech)
+│ │ └── logger.util.ts # Logs formatados e coloridos
+│ │
+│ ├── app.module.ts
+│ └── main.ts # Bootstrap principal do NestJS
+│
+├── .env.example # Configurações de ambiente (IP e Porta UDP)
+├── README.md # Documentação inicial
+└── package.json
+
+## 🧠 Pacotes UDP Processados no MVP
+
+| Pacote        | ID  | Função                                                     |
+| ------------- | --- | ---------------------------------------------------------- |
+| Car Telemetry | 6   | Dados de velocidade, DRS, temperatura de pneus, aceleração |
+| Car Status    | 7   | ERS, combustível, assistências, modos de pilotagem         |
+| Car Damage    | 10  | Desgaste e danos nos pneus e partes do carro               |
+| Event         | 3   | Eventos críticos como colisões, penalidades e DRS ativado  |
+| Lap Data      | 2   | Dados de voltas, pit stops, posição e tempo de volta       |
+
+---
+
+## 🎯 Principais Alertas Automáticos
+
+- **ERS (m_ersStoreEnergy)** → Alerta para gerenciamento da bateria
+- **Temperatura dos Pneus (m_tyresSurfaceTemperature)** → Alerta de superaquecimento
+- **Combustível (m_fuelInTank, m_fuelRemainingLaps)** → Alerta de baixo combustível
+- **DRS (m_drs, m_drsAllowed, m_drsActivationDistance)** → Alerta de ativação de DRS
+- **Eventos Críticos (eventos como DRSE, COLL, PENA, etc.)** → Alerta instantâneo
+
+---
+
+## ✅ MVP — Foco Inicial
+
+- Captura UDP
+- Alertas automáticos de ERS, pneus, combustível, DRS e eventos
+- Logs no terminal + Voz (TTS)
+- 100% offline (sem interface gráfica por enquanto)
+
+---
+
+## 🔥 Roadmap Futuro (Pós-MVP)
+
+| Fase | Funcionalidade                                |
+| ---- | --------------------------------------------- |
+| 2    | Painel Web ou App Mobile (monitoramento live) |
+| 3    | Comandos de voz para consulta do status       |
+| 4    | Banco de dados para histórico de sessões      |
+| 5    | IA para recomendações e análises preditivas   |
+
+---
+
+## ⚙️ Variáveis de Ambiente (.env)
+
+```env
+UDP_IP=192.168.1.10
+UDP_PORT=20777
+
+
+
+---
+
+Se quiser, posso:
+- Gerar o arquivo `README.md` completo no seu projeto;
+- Adaptar o texto (mais técnico, casual, ou comercial);
+- Traduzir para inglês ou deixar bilíngue.
+
+Quer que eu já gere esse arquivo pronto para você colar no repositório?
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
