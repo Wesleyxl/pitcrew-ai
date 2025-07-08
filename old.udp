@@ -1,0 +1,37 @@
+// src/telemetry/udp.service.ts
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as dgram from 'dgram';
+import chalk from 'chalk';
+
+@Injectable()
+export class UdpService implements OnModuleInit {
+  constructor(private cfg: ConfigService) {}
+
+  onModuleInit() {
+    const port = this.cfg.get<number>('UDP_PORT', 20777);
+    // const ps5Ip = this.cfg.get<string>('PS5_IP', '192.168.1.12');
+    const socket = dgram.createSocket('udp4');
+
+    socket.bind(port, '0.0.0.0', () => {
+      socket.setBroadcast(true);
+      console.log(chalk.cyan(`📡 UDP bind em 0.0.0.0:${port}`));
+      // handshake para ativar unicast dos IDs
+      // socket.send(Buffer.alloc(1), port, ps5Ip, (err) =>
+      //   console.log(
+      //     err
+      //       ? chalk.red(`Handshake falhou: ${err.message}`)
+      //       : chalk.green(`🤝 Handshake enviado para ${ps5Ip}:${port}`),
+      //   ),
+      // );
+    });
+
+    socket.on('message', (msg, rinfo) => {
+      // if (rinfo.address !== ps5Ip) return;
+      console.log(
+        chalk.green(`📡 Pacote UDP recebido de ${rinfo.address}:${rinfo.port}`),
+        chalk.gray(msg.readUInt8(6)),
+      );
+    });
+  }
+}

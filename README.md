@@ -32,12 +32,10 @@ O app captura dados de telemetria em tempo real via UDP, analisa métricas cruci
 
 ---
 
-## 📦 Arquitetura do Projeto (Clean Architecture)
-
 ## 📦 UDP Packet IDs & Módulos
 
-No protocolo UDP do F1 24/25, cada _Packet ID_ corresponde a um tipo de dado.  
-Abaixo está a lista dos principais IDs, uma breve descrição e onde você pode colocar seu parser/handler no projeto.
+No protocolo UDP do F1 23/24/25, cada _Packet ID_ corresponde a um tipo de dado.  
+Abaixo está a lista dos principais IDs, uma breve descrição de cada um
 
 | ID  | Nome                 | Descrição                                                                                             | Módulo Sugerido                  | Arquivo de Parser          |
 | --- | -------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------- |
@@ -59,7 +57,7 @@ Abaixo está a lista dos principais IDs, uma breve descrição e onde você pode
 
 ---
 
-### 📁 Estrutura de Pastas Sugerida
+## 📦 Arquitetura do Projeto (Clean Architecture)
 
 ```plaintext
 src/
