@@ -1,5 +1,3 @@
-// src/telemetry/lap/lap.parser.ts
-
 /**
  * Todos os campos extraídos do Pacote Lap Data (Packet ID = 2)
  */
