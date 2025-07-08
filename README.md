@@ -34,44 +34,82 @@ O app captura dados de telemetria em tempo real via UDP, analisa métricas cruci
 
 ## 📦 Arquitetura do Projeto (Clean Architecture)
 
-pitcrew-ai/
-│
-├── src/
-│ ├── telemetry/ # Lógica de telemetria UDP
-│ │ ├── telemetry.module.ts
-│ │ ├── udp.service.ts # Listener UDP + roteamento de pacotes
-│ │ ├── parsers/ # Parsers para cada tipo de pacote UDP
-│ │ │ ├── telemetry.parser.ts
-│ │ │ ├── status.parser.ts
-│ │ │ └── event.parser.ts
-│ │ └── alerts/ # Regras e alertas automáticos
-│ │ ├── ers.alert.ts
-│ │ ├── tyre.alert.ts
-│ │ ├── drs.alert.ts
-│ │ └── fuel.alert.ts
-│ │
-│ ├── common/ # Utilitários gerais
-│ │ ├── tts.util.ts # Função de voz (Text-to-Speech)
-│ │ └── logger.util.ts # Logs formatados e coloridos
-│ │
-│ ├── app.module.ts
-│ └── main.ts # Bootstrap principal do NestJS
-│
-├── .env.example # Configurações de ambiente (IP e Porta UDP)
-├── README.md # Documentação inicial
-└── package.json
+## 📦 UDP Packet IDs & Módulos
 
-## 🧠 Pacotes UDP Processados no MVP
+No protocolo UDP do F1 24/25, cada _Packet ID_ corresponde a um tipo de dado.  
+Abaixo está a lista dos principais IDs, uma breve descrição e onde você pode colocar seu parser/handler no projeto.
 
-| Pacote        | ID  | Função                                                     |
-| ------------- | --- | ---------------------------------------------------------- |
-| Car Telemetry | 6   | Dados de velocidade, DRS, temperatura de pneus, aceleração |
-| Car Status    | 7   | ERS, combustível, assistências, modos de pilotagem         |
-| Car Damage    | 10  | Desgaste e danos nos pneus e partes do carro               |
-| Event         | 3   | Eventos críticos como colisões, penalidades e DRS ativado  |
-| Lap Data      | 2   | Dados de voltas, pit stops, posição e tempo de volta       |
+| ID  | Nome                 | Descrição                                                                                             | Módulo Sugerido                  | Arquivo de Parser          |
+| --- | -------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------- |
+| 0   | Motion               | Posição, velocidade e vetores de força G para todos os carros.                                        | `telemetry/motion`               | `motion.parser.ts`         |
+| 1   | Session              | Estado da sessão: clima, tempo restante, setores, zona de box, regras, forecast de tempo.             | `telemetry/session`              | `session.parser.ts`        |
+| 2   | Lap Data             | Tempos de volta e deltas: última volta, volta atual, distância, posição, status de piloto.            | `telemetry/lap`                  | `lap.parser.ts`            |
+| 3   | Event                | Eventos disparados (fastest lap, DRS on/off, safety car, flashback, overtakes, colisões etc.)         | `telemetry/event`                | `event.parser.ts`          |
+| 4   | Participants         | Lista de pilotos/carros na sessão, controle AI/humano, nome, equipe, telemetry pública/restrita.      | `telemetry/participants`         | `participants.parser.ts`   |
+| 5   | Car Setups           | Ajustes de carro: asa dianteira/traseira, suspensão, cambagem, pressão de pneus, carga de combustível | `telemetry/car-setup`            | `setup.parser.ts`          |
+| 6   | Car Telemetry        | Telemetria em tempo real: aceleração, freio, embreagem, marcha, RPM, DRS, temperatura e pressão.      | `telemetry/telemetry`            | `telemetry.parser.ts`      |
+| 7   | Car Status           | Estado do carro: fuel mix, ERS, DRS allow, life do combustível, condições de falha/entrada de pit.    | `telemetry/car-status`           | `status.parser.ts`         |
+| 8   | Final Classification | Classificação final ao fim da corrida: posição, pontos, tempo total, melhores voltas e penalidades.   | `telemetry/final-classification` | `classification.parser.ts` |
+| 9   | Lobby Info           | Info de lobby multiplayer: jogadores, status de ready, AI, plataforma, número do carro.               | `telemetry/lobby`                | `lobby.parser.ts`          |
+| 10  | Car Damage           | Nível de desgaste e dano: pneus, asas, freios, motor, ERS, gearbox.                                   | `telemetry/car-damage`           | `damage.parser.ts`         |
+| 11  | Session History      | Histórico de voltas e stint de pneus para cada carro ao longo da sessão.                              | `telemetry/session-history`      | `history.parser.ts`        |
+| 12  | Tyre Sets            | Detalhes de cada conjunto de pneus: desgaste, vida útil, disponível, recomendado.                     | `telemetry/tyre-sets`            | `tyres.parser.ts`          |
+| 13  | Motion Ex            | Dados estendidos de motion (suspensão, velocidade das rodas, forças nos pneus, chassis yaw etc.)      | `telemetry/motion-ex`            | `motion-ex.parser.ts`      |
+| 14  | Time Trial           | Dados específicos de Time Trial: melhores tempos, personal best, rival, configurações de assist.      | `telemetry/time-trial`           | `time-trial.parser.ts`     |
 
 ---
+
+### 📁 Estrutura de Pastas Sugerida
+
+```plaintext
+src/
+└── telemetry/
+    ├── motion/
+    │   ├── motion.module.ts
+    │   └── motion.parser.ts
+    ├── session/
+    │   ├── session.module.ts
+    │   └── session.parser.ts
+    ├── lap/
+    │   ├── lap.module.ts
+    │   └── lap.parser.ts
+    ├── event/
+    │   ├── event.module.ts
+    │   └── event.parser.ts
+    ├── participants/
+    │   ├── participants.module.ts
+    │   └── participants.parser.ts
+    ├── car-setup/
+    │   ├── car-setup.module.ts
+    │   └── setup.parser.ts
+    ├── telemetry/
+    │   ├── telemetry.module.ts
+    │   └── telemetry.parser.ts
+    ├── car-status/
+    │   ├── car-status.module.ts
+    │   └── status.parser.ts
+    ├── final-classification/
+    │   ├── final-classification.module.ts
+    │   └── classification.parser.ts
+    ├── lobby/
+    │   ├── lobby.module.ts
+    │   └── lobby.parser.ts
+    ├── car-damage/
+    │   ├── car-damage.module.ts
+    │   └── damage.parser.ts
+    ├── session-history/
+    │   ├── session-history.module.ts
+    │   └── history.parser.ts
+    ├── tyre-sets/
+    │   ├── tyre-sets.module.ts
+    │   └── tyres.parser.ts
+    ├── motion-ex/
+    │   ├── motion-ex.module.ts
+    │   └── motion-ex.parser.ts
+    └── time-trial/
+        ├── time-trial.module.ts
+        └── time-trial.parser.ts
+```
 
 ## 🎯 Principais Alertas Automáticos
 

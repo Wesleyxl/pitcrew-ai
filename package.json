@@ -24,6 +24,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "cap": "^0.2.1",
     "chalk": "^5.4.1",
     "dotenv": "^17.0.1",
     "f1-telemetry-client": "^0.1.26",
