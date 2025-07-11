@@ -1,12 +1,16 @@
-import { SimulatorAdapter } from './simulator-adapter.interface';
-import { LapParser } from '../parsers/lap.parse';
-import { ParsedTelemetry } from '../models/parsed-telemetry';
+// src/simulators/f1-24/adapter/f124.adapter.ts
 
-export class F124Adapter implements SimulatorAdapter<ParsedTelemetry> {
+import { SimulatorAdapter } from './simulator-adapter.interface';
+import { ParsedTelemetry } from '../models/parsed-telemetry';
+import { LapParser } from '../parsers/lap.parse';
+import { EventParser } from '../parsers/event.parse';
+// … outros parsers
+
+export class F124Adapter implements SimulatorAdapter<ParsedTelemetry | null> {
   private readonly validIds = [
     LapParser.PACKET_ID,
-
-    // …outros packet IDs (3..14)
+    EventParser.PACKET_ID,
+    // … demais packet IDs
   ];
 
   supports(buffer: Buffer): boolean {
@@ -14,19 +18,23 @@ export class F124Adapter implements SimulatorAdapter<ParsedTelemetry> {
     return this.validIds.includes(pid);
   }
 
-  parse(buffer: Buffer): ParsedTelemetry {
+  parse(buffer: Buffer): ParsedTelemetry | null {
     const pid = buffer.readUInt8(6);
-    switch (pid) {
-      case LapParser.PACKET_ID: {
-        const lapData = LapParser.parse(buffer);
-        if (lapData === null) {
-          throw new Error('Failed to parse LapData');
-        }
-        return lapData;
+
+    try {
+      switch (pid) {
+        case LapParser.PACKET_ID:
+          return LapParser.parse(buffer);
+        case EventParser.PACKET_ID:
+          return EventParser.parse(buffer); // agora pode retornar null
+        // … demais parsers:
+        // case XParser.PACKET_ID: return XParser.parse(buffer);
+        default:
+          return null;
       }
-      // …demais parsers
-      default:
-        throw new Error(`F124Adapter: packetId ${pid} não suportado`);
+    } catch (err) {
+      console.warn(`F124Adapter: erro ao parse PID=${pid}`, err);
+      return null;
     }
   }
 }

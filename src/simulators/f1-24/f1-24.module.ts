@@ -5,11 +5,13 @@ import { AlertService } from './services/alert.service';
 import { TelemetryGateway } from './gateways/telemetry.gateway';
 import { AlertsGateway } from './gateways/alerts.gateway';
 import { UdpModule } from 'src/core/udp.module';
+import { EventService } from './services/event.service';
 
 @Module({
   imports: [UdpModule],
   providers: [
     F124TelemetryService,
+    EventService,
     LapService,
     AlertService,
     TelemetryGateway,
