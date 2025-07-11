@@ -1,3 +1,5 @@
+// src/telemetry/event/event.parser.ts
+
 /**
  * Todos os campos extraídos do Pacote Event Data (Packet ID = 3)
  * Eventos disparados durante a sessão: melhor volta, DRS, safety car, flashbacks, colisões etc.
@@ -128,7 +130,7 @@ export interface CollisionEvent extends BaseEvent {
 
 export class EventParser {
   public static readonly PACKET_ID = 3;
-  private static readonly HEADER_LENGTH = 29; // até o código de evento
+  private static readonly HEADER_LENGTH = 9; // até o código de evento
 
   /**
    * Faz parse de um buffer UDP de Event Data.
@@ -241,11 +243,7 @@ export class EventParser {
         };
       default:
         // eventos não mapeados
-        return {
-          eventCode: code,
-          vehicle1Idx: 0, // or some other default value
-          vehicle2Idx: 0, // or some other default value
-        } as EventData;
+        return null;
     }
   }
 }

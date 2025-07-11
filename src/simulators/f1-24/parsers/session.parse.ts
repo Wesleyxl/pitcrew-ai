@@ -1,3 +1,5 @@
+// src/telemetry/session/session.parser.ts
+
 /**
  * Dados extraídos do Pacote Session Data (Packet ID = 1)
  * Estado da sessão: clima, tempo restante, setores, zonas de marshal, safety car, etc.

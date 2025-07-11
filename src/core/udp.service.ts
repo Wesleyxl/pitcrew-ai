@@ -6,6 +6,8 @@ import { Subject } from 'rxjs';
 @Injectable()
 export class UdpService implements OnModuleInit, OnModuleDestroy {
   private socket = dgram.createSocket('udp4');
+
+  // Stream com todos os buffers brutos que chegam pelo UDP
   public readonly raw$ = new Subject<Buffer>();
 
   constructor(private readonly config: ConfigService) {}
@@ -16,11 +18,13 @@ export class UdpService implements OnModuleInit, OnModuleDestroy {
 
     this.socket.bind(port, host, () => {
       this.socket.setBroadcast(true);
-      console.log(`📡 UDP bind em ${host}:${port}`);
+      console.log(`📡 UDP bind in ${host}:${port}`);
     });
-    this.socket.on('message', (msg) => this.raw$.next(msg));
-  }
 
+    this.socket.on('message', (msg: Buffer) => {
+      this.raw$.next(msg);
+    });
+  }
   onModuleDestroy() {
     this.socket.close();
     this.raw$.complete();

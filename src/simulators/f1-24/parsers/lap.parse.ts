@@ -1,4 +1,9 @@
 /**
+ * src/simulators/f1-24/parsers/lap.parse.ts
+ * Parser for Lap Data packet (Packet ID = 2) in F1-24 telemetry
+ */
+
+/**
  * Todos os campos extraídos do Pacote Lap Data (Packet ID = 2)
  */
 export interface LapData {
@@ -70,6 +75,9 @@ export interface LapData {
   speedTrapFastestLap: number;
 }
 
+/**
+ * Parser para o pacote Lap Data (Packet ID = 2)
+ */
 export class LapParser {
   /** Packet ID oficial para Lap Data */
   public static readonly PACKET_ID = 2;
@@ -83,10 +91,10 @@ export class LapParser {
    * Retorna null se não for Packet ID 2.
    */
   public static parse(buffer: Buffer): LapData | null {
-    // 1) Verifica Packet ID se é Lap Data
+    // Verifica Packet ID
     if (buffer.readUInt8(6) !== LapParser.PACKET_ID) return null;
 
-    // 2) Valida tamanho mínimo: HEADER + payload
+    // Valida tamanho mínimo: HEADER + payload
     const minLen = LapParser.HEADER_LENGTH + LapParser.PAYLOAD_LENGTH;
     if (buffer.length < minLen) {
       throw new Error(
@@ -96,40 +104,40 @@ export class LapParser {
 
     const b = LapParser.HEADER_LENGTH;
 
-    // 3) Extrai cada campo conforme offsets da spec
-    const lastLapTimeMs = buffer.readUInt32LE(b + 0); // 29..32
-    const currentLapTimeMs = buffer.readUInt32LE(b + 4); // 33..36
-    const sector1TimeMsPart = buffer.readUInt16LE(b + 8); // 37..38
-    const sector1TimeMinutesPart = buffer.readUInt8(b + 10); // 39
-    const sector2TimeMsPart = buffer.readUInt16LE(b + 11); // 40..41
-    const sector2TimeMinutesPart = buffer.readUInt8(b + 13); // 42
-    const deltaToCarInFrontMsPart = buffer.readUInt16LE(b + 14); // 43..44
-    const deltaToCarInFrontMinutesPart = buffer.readUInt8(b + 16); // 45
-    const deltaToRaceLeaderMsPart = buffer.readUInt16LE(b + 17); // 46..47
-    const deltaToRaceLeaderMinutesPart = buffer.readUInt8(b + 19); // 48
-    const lapDistance = buffer.readFloatLE(b + 20); // 49..52
-    const totalDistance = buffer.readFloatLE(b + 24); // 53..56
-    const safetyCarDelta = buffer.readFloatLE(b + 28); // 57..60
-    const carPosition = buffer.readUInt8(b + 32); // 61
-    const currentLapNum = buffer.readUInt8(b + 33); // 62
-    const pitStatus = buffer.readUInt8(b + 34); // 63
-    const numPitStops = buffer.readUInt8(b + 35); // 64
-    const sector = buffer.readUInt8(b + 36); // 65
-    const currentLapInvalid = buffer.readUInt8(b + 37); // 66
-    const penalties = buffer.readUInt8(b + 38); // 67
-    const totalWarnings = buffer.readUInt8(b + 39); // 68
-    const cornerCuttingWarnings = buffer.readUInt8(b + 40); // 69
-    const numUnservedDriveThroughPens = buffer.readUInt8(b + 41); // 70
-    const numUnservedStopGoPens = buffer.readUInt8(b + 42); // 71
-    const gridPosition = buffer.readUInt8(b + 43); // 72
-    const driverStatus = buffer.readUInt8(b + 44); // 73
-    const resultStatus = buffer.readUInt8(b + 45); // 74
-    const pitLaneTimerActive = buffer.readUInt8(b + 46); // 75
-    const pitLaneTimeInLaneInMs = buffer.readUInt16LE(b + 47); // 76..77
-    const pitStopTimerInMs = buffer.readUInt16LE(b + 49); // 78..79
-    const pitStopShouldServePen = buffer.readUInt8(b + 51); // 80
-    const speedTrapFastestSpeed = buffer.readFloatLE(b + 52); // 81..84
-    const speedTrapFastestLap = buffer.readUInt8(b + 56); // 85
+    // Extrai cada campo conforme offsets da spec
+    const lastLapTimeMs = buffer.readUInt32LE(b + 0);
+    const currentLapTimeMs = buffer.readUInt32LE(b + 4);
+    const sector1TimeMsPart = buffer.readUInt16LE(b + 8);
+    const sector1TimeMinutesPart = buffer.readUInt8(b + 10);
+    const sector2TimeMsPart = buffer.readUInt16LE(b + 11);
+    const sector2TimeMinutesPart = buffer.readUInt8(b + 13);
+    const deltaToCarInFrontMsPart = buffer.readUInt16LE(b + 14);
+    const deltaToCarInFrontMinutesPart = buffer.readUInt8(b + 16);
+    const deltaToRaceLeaderMsPart = buffer.readUInt16LE(b + 17);
+    const deltaToRaceLeaderMinutesPart = buffer.readUInt8(b + 19);
+    const lapDistance = buffer.readFloatLE(b + 20);
+    const totalDistance = buffer.readFloatLE(b + 24);
+    const safetyCarDelta = buffer.readFloatLE(b + 28);
+    const carPosition = buffer.readUInt8(b + 32);
+    const currentLapNum = buffer.readUInt8(b + 33);
+    const pitStatus = buffer.readUInt8(b + 34);
+    const numPitStops = buffer.readUInt8(b + 35);
+    const sector = buffer.readUInt8(b + 36);
+    const currentLapInvalid = buffer.readUInt8(b + 37);
+    const penalties = buffer.readUInt8(b + 38);
+    const totalWarnings = buffer.readUInt8(b + 39);
+    const cornerCuttingWarnings = buffer.readUInt8(b + 40);
+    const numUnservedDriveThroughPens = buffer.readUInt8(b + 41);
+    const numUnservedStopGoPens = buffer.readUInt8(b + 42);
+    const gridPosition = buffer.readUInt8(b + 43);
+    const driverStatus = buffer.readUInt8(b + 44);
+    const resultStatus = buffer.readUInt8(b + 45);
+    const pitLaneTimerActive = buffer.readUInt8(b + 46);
+    const pitLaneTimeInLaneInMs = buffer.readUInt16LE(b + 47);
+    const pitStopTimerInMs = buffer.readUInt16LE(b + 49);
+    const pitStopShouldServePen = buffer.readUInt8(b + 51);
+    const speedTrapFastestSpeed = buffer.readFloatLE(b + 52);
+    const speedTrapFastestLap = buffer.readUInt8(b + 56);
 
     return {
       lastLapTimeMs,
