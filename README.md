@@ -34,7 +34,7 @@ O app captura dados de telemetria em tempo real via UDP, analisa métricas cruci
 
 ## 📦 UDP Packet IDs & Módulos
 
-No protocolo UDP do F1 23/24/25, cada _Packet ID_ corresponde a um tipo de dado.  
+No protocolo UDP do F1 23/24/25, cada _Packet ID_ corresponde a um tipo de dado.
 Abaixo está a lista dos principais IDs, uma breve descrição de cada um
 
 | ID  | Nome                 | Descrição                                                                                             | Módulo Sugerido                  | Arquivo de Parser          |
@@ -61,52 +61,36 @@ Abaixo está a lista dos principais IDs, uma breve descrição de cada um
 
 ```plaintext
 src/
-└── telemetry/
-    ├── motion/
-    │   ├── motion.module.ts
-    │   └── motion.parser.ts
-    ├── session/
-    │   ├── session.module.ts
-    │   └── session.parser.ts
-    ├── lap/
-    │   ├── lap.module.ts
-    │   └── lap.parser.ts
-    ├── event/
-    │   ├── event.module.ts
-    │   └── event.parser.ts
-    ├── participants/
-    │   ├── participants.module.ts
-    │   └── participants.parser.ts
-    ├── car-setup/
-    │   ├── car-setup.module.ts
-    │   └── setup.parser.ts
-    ├── telemetry/
-    │   ├── telemetry.module.ts
-    │   └── telemetry.parser.ts
-    ├── car-status/
-    │   ├── car-status.module.ts
-    │   └── status.parser.ts
-    ├── final-classification/
-    │   ├── final-classification.module.ts
-    │   └── classification.parser.ts
-    ├── lobby/
-    │   ├── lobby.module.ts
-    │   └── lobby.parser.ts
-    ├── car-damage/
-    │   ├── car-damage.module.ts
-    │   └── damage.parser.ts
-    ├── session-history/
-    │   ├── session-history.module.ts
-    │   └── history.parser.ts
-    ├── tyre-sets/
-    │   ├── tyre-sets.module.ts
-    │   └── tyres.parser.ts
-    ├── motion-ex/
-    │   ├── motion-ex.module.ts
-    │   └── motion-ex.parser.ts
-    └── time-trial/
-        ├── time-trial.module.ts
-        └── time-trial.parser.ts
+├─ core/
+│   ├ udp.service.ts            # socket UDP e raw$
+│   └ core.module.ts
+│
+├─ simulators/
+│   ├─ f1-24/
+│   │   ├ f1-24.module.ts       # importa Adapter, Services, Gateways, Rules
+│   │   │
+│   │   ├ adapter/
+│   │   │   ├ f1-24.adapter.ts  # implements SimulatorAdapter
+│   │   │   └ parser-factory.ts # mapeia packetId → parser
+│   │   │
+│   │   ├ parsers/              # todos os lap.parse.ts, event.parse.ts…
+│   │   │
+│   │   ├ services/
+│   │   │   ├ f1-telemetry.service.ts  # filtra raw$, chama adapter.parse
+│   │   │   ├ lap.service.ts            # só para F1-24
+│   │   │   ├ rule-engine.service.ts    # regras específicas (DRS, overheat…)
+│   │   │   └ alert.service.ts          # alertas/TTS de F1
+│   │   │
+│   │   ├ gateways/
+│   │   │   ├ telemetry.gateway.ts      # ws /telemetry/f1
+│   │   │   └ alerts.gateway.ts         # ws /alerts/f1
+│   │   │
+│   │   └ rules/                        # config YAML/JSON e definições RxJS
+│   │
+│   └─ automobilista2/  (mesmo padrão)
+│
+├─ app.module.ts                # importa CoreModule + todos os simulator modules
+└─ main.ts
 ```
 
 ## 🎯 Principais Alertas Automáticos
