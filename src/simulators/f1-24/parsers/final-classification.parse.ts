@@ -3,7 +3,7 @@
 /**
  * Todos os campos extraídos do Pacote Final Classification (Packet ID = 8)
  */
-export interface FinalClassificationEntry {
+export interface FinalClassificationData {
   /** Posição de chegada (1 = vencedor) */
   position: number;
   /** Total de voltas completadas */
@@ -42,7 +42,7 @@ export interface FinalClassificationPacket {
   /** Número de carros na classificação final */
   numCars: number;
   /** Lista de dados de classificação, na ordem de veículo (0–21) */
-  classifications: FinalClassificationEntry[];
+  classifications: FinalClassificationData[];
 }
 
 export class FinalClassificationParser {
@@ -78,11 +78,11 @@ export class FinalClassificationParser {
       );
     }
 
-    const classifications: FinalClassificationEntry[] = [];
+    const classifications: FinalClassificationData[] = [];
     let offset = FinalClassificationParser.HEADER_LENGTH + 1;
 
     for (let i = 0; i < numCars; i++) {
-      const entry: FinalClassificationEntry = {
+      const entry: FinalClassificationData = {
         position: buffer.readUInt8(offset + 0),
         numLaps: buffer.readUInt8(offset + 1),
         gridPosition: buffer.readUInt8(offset + 2),

@@ -36,7 +36,7 @@ export interface CarMotionData {
 /**
  * PacketMotionData holds motion data for all cars on track
  */
-export interface PacketMotionData {
+export interface MotionData {
   carMotionData: CarMotionData[];
 }
 
@@ -52,7 +52,7 @@ export class MotionParser {
    * Parses a UDP buffer as Motion Data.
    * Returns null if not Packet ID 0 or buffer too short.
    */
-  public static parse(buffer: Buffer): PacketMotionData | null {
+  public static parse(buffer: Buffer): MotionData | null {
     // Verify Packet ID
     if (buffer.readUInt8(6) !== MotionParser.PACKET_ID) {
       return null;

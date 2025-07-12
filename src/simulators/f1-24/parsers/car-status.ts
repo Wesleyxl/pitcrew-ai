@@ -31,6 +31,10 @@ export interface CarStatusData {
   networkPaused: number; // 0 = not paused, 1 = paused
 }
 
+export interface PacketCarStatus {
+  /** Array de status para todos os carros (índice = vehicleIndex) */
+  carStatusData: CarStatusData[];
+}
 export class CarStatusParser {
   public static readonly PACKET_ID = 7;
   private static readonly HEADER_LENGTH = 29;
@@ -41,11 +45,9 @@ export class CarStatusParser {
    * Faz o parse de todo o PacketCarStatusData e retorna o array de CarStatusData
    * ou retorna null se não for Packet ID 7.
    */
-  public static parse(buffer: Buffer): CarStatusData[] | null {
+  public static parse(buffer: Buffer): PacketCarStatus | null {
     // 1) Só processa se for o ID correto
-    if (buffer.readUInt8(6) !== CarStatusParser.PACKET_ID) {
-      return null;
-    }
+    if (buffer.readUInt8(6) !== CarStatusParser.PACKET_ID) return null;
 
     // 2) Valida tamanho mínimo
     const minLen =
@@ -93,6 +95,6 @@ export class CarStatusParser {
       offset += CarStatusParser.DATA_LENGTH;
     }
 
-    return cars;
+    return { carStatusData: cars };
   }
 }

@@ -3,7 +3,7 @@
 /**
  * Data de um único participante no lobby (Packet ID = 9)
  */
-export interface LobbyPlayer {
+export interface LobbyInfoData {
   /** 1 = AI controlled, 0 = human */
   aiControlled: boolean;
   /** ID do time (appendix) */
@@ -33,7 +33,7 @@ export interface LobbyInfoPacket {
   /** Quantidade de jogadores no lobby */
   numPlayers: number;
   /** Dados de cada participante ativo */
-  players: LobbyPlayer[];
+  players: LobbyInfoData[];
 }
 
 export class LobbyInfoParser {
@@ -69,7 +69,7 @@ export class LobbyInfoParser {
       );
     }
 
-    const players: LobbyPlayer[] = [];
+    const players: LobbyInfoData[] = [];
     let offset = LobbyInfoParser.HEADER_LENGTH + 1;
 
     for (let i = 0; i < numPlayers; i++) {
